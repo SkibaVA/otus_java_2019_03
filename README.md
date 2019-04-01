@@ -1,2 +1,2 @@
-# otus_java_2019_03
+# Курса "Разработчик Java" в OTUS
 Java course
