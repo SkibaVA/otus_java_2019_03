@@ -1,2 +1,6 @@
 # Курса "Разработчик Java" в OTUS
-Java course
+Группа 2019-03
+
+Skiba Vadim (Скиба Вадим)
+
+lmaforl2849327@gmail.com
