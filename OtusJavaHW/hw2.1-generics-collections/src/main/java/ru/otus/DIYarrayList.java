@@ -7,14 +7,13 @@ public class DIYarrayList<T> implements List<T> {
 
 	private static final Object[] EMPTY_ELEMENTDATA = null;
 
-	Object[] elementData;
+	private Object[] elementData;
 	
 	private int size;
 	
-	int modCount = 0;
+	private int modCount = 0;
 	
-	public DIYarrayList()
-	{
+	public DIYarrayList(){
 		elementData = new Object[10];
 	}
 	
@@ -224,14 +223,16 @@ public class DIYarrayList<T> implements List<T> {
     static <T> T elementAt(Object[] es, int index) {
         return (T) es[index];
     }
-    
-    private class Itr implements Iterator<T> {
+  
+   
+    private class ListItr implements ListIterator<T> {
         int cursor;       // index of next element to return
         int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
 
-        // prevent creating a synthetic constructor
-        Itr() {}
+    	ListItr(int index) {
+            cursor = index;
+        }
 
         public boolean hasNext() {
             return cursor != size;
@@ -286,14 +287,6 @@ public class DIYarrayList<T> implements List<T> {
         final void checkForComodification() {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
-        }
-    }
- 
-   
-    private class ListItr extends Itr implements ListIterator<T> {
-        ListItr(int index) {
-            super();
-            cursor = index;
         }
 
         public boolean hasPrevious() {
