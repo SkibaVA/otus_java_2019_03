@@ -10,7 +10,9 @@
 
     <modules>
         <module>hw01-maven</module>
-</modules>
+        <module>Annotations_Reflection</module>
+        <module>hw06-annotations_reflection</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
