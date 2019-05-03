@@ -1,8 +1,9 @@
-package ru.otus;
+package ru.otus.Annotations;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
 
 @Retention(RUNTIME)
-@interface AfterEach {}
+public
+@interface Test {}

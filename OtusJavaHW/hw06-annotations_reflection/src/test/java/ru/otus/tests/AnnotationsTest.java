@@ -1,4 +1,6 @@
-package ru.otus;
+package ru.otus.tests;
+
+import ru.otus.Annotations.*;
 
 public class AnnotationsTest {
     @BeforeAll
@@ -31,7 +33,8 @@ public class AnnotationsTest {
     }
 
     @Test
-    void testOne() {
+    void testOne() throws Exception {
+    	//throw new Exception("Error test testOne");
         System.out.println("testOne");
     }
 
