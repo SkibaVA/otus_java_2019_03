@@ -17,60 +17,107 @@ final public class Runner {
 		throw new UnsupportedOperationException();
 	}
 	
-	private static Map<String, List<Method>> getMethodMap(Class<?> testClass) 
+	final private static class TestingContext
 	{
-		Method[] declareMethod =  testClass.getDeclaredMethods();
+		private enum Annotations
+		{
+			BEFORE_ALL("BeforeAll"),
+			AFTER_ALL("AfterAll"),
+			BEFORE_EACH("BeforeEach"),
+			AFTER_EACH("AfterEach"),
+			TEST("Test");
+			
+			private String name;
+			
+			Annotations(String name)
+			{
+				this.name = name;
+			}
+			
+			public String getName() 
+			{
+				return name;	
+			}
+		}
 		
-		List<Method> AnnotationTest = new ArrayList<Method>();
-		List<Method> AnnotationBeforeEach = new ArrayList<Method>();
-		List<Method> AnnotationAfterEach = new ArrayList<Method>();
-		List<Method> AnnotationBeforeAll = new ArrayList<Method>();
-		List<Method> AnnotationAfterAll = new ArrayList<Method>();
+		private Class<?> clazz = null;
+		private Map<String, List<Method>> methodMap = new HashMap<String, List<Method>>();
 		
-		for(Method m: declareMethod)
-    	{	
-    		if(m.isAnnotationPresent(BeforeAll.class)) 
-    		{
-    			AnnotationBeforeAll.add(m);
-    		}else if(m.isAnnotationPresent(AfterAll.class)) 
-    		{
-    			AnnotationAfterAll.add(m);
-    		}else if (m.isAnnotationPresent(Test.class))
-    		{
-    			AnnotationTest.add(m);
-    		}else if(m.isAnnotationPresent(BeforeEach.class)) 
-    		{
-    			AnnotationBeforeEach.add(m);
-    		}else if(m.isAnnotationPresent(AfterEach.class)) 
-    		{
-    			AnnotationAfterEach.add(m);
-    		}
-    	}
-		
-		Map<String, List<Method>> methodMap = new HashMap<String, List<Method>>();
-		methodMap.put("AnnotationBeforeAll", AnnotationBeforeAll);
-		methodMap.put("AnnotationAfterAll", AnnotationAfterAll);
-		methodMap.put("AnnotationBeforeEach", AnnotationBeforeEach);
-		methodMap.put("AnnotationAfterEach", AnnotationAfterEach);
-		methodMap.put("AnnotationTest", AnnotationTest);
-		
-		return methodMap;
-	}
+		public TestingContext(Class<?> clazz)
+		{
+			this.clazz = clazz;
+			setMethodMap();
+		}
 	
-	private static void start(Method m, Object o) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException 
-	{
-		m.setAccessible(true);
-		m.invoke(o);
-		m.setAccessible(false);
-	}
+		private void setMethodMap()
+		{
+			Method[] declareMethod =  clazz.getDeclaredMethods();
+			
+			List<Method> AnnotationTest = new ArrayList<Method>();
+			List<Method> AnnotationBeforeEach = new ArrayList<Method>();
+			List<Method> AnnotationAfterEach = new ArrayList<Method>();
+			List<Method> AnnotationBeforeAll = new ArrayList<Method>();
+			List<Method> AnnotationAfterAll = new ArrayList<Method>();
+			
+			for(Method m: declareMethod)
+	    	{					
+	    		if(m.isAnnotationPresent(BeforeAll.class)) 
+	    		{
+	    			AnnotationBeforeAll.add(m);
+	    		}else if(m.isAnnotationPresent(AfterAll.class)) 
+	    		{
+	    			AnnotationAfterAll.add(m);
+	    		}else if (m.isAnnotationPresent(Test.class))
+	    		{
+	    			AnnotationTest.add(m);
+	    		}else if(m.isAnnotationPresent(BeforeEach.class)) 
+	    		{
+	    			AnnotationBeforeEach.add(m);
+	    		}else if(m.isAnnotationPresent(AfterEach.class)) 
+	    		{
+	    			AnnotationAfterEach.add(m);
+	    		}
+	    	}
+			
+			methodMap.put(Annotations.BEFORE_ALL.getName(), AnnotationBeforeAll);
+			methodMap.put(Annotations.AFTER_ALL.getName(), AnnotationAfterAll);
+			methodMap.put(Annotations.BEFORE_EACH.getName(), AnnotationBeforeEach);
+			methodMap.put(Annotations.AFTER_EACH.getName(), AnnotationAfterEach);
+			methodMap.put(Annotations.TEST.getName(), AnnotationTest);
+		}
 	
-	private static Object CreateObject(Constructor<?> c) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException 
-	{
-		c.setAccessible(true);
-		Object o = c.newInstance();
-		c.setAccessible(false);
+		public Map<String, List<Method>> getMethodMap()
+		{
+			return methodMap;
+		}
 		
-		return o;
+		public void executeAsAccessible(Method m, Object o) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException 
+		{
+			m.setAccessible(true);
+			m.invoke(o);
+			m.setAccessible(false);
+		}
+		
+		public Object сreateObject(Constructor<?> c) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException 
+		{
+			c.setAccessible(true);
+			Object o = c.newInstance();
+			c.setAccessible(false);
+			
+			return o;
+		}
+		
+		public void executeByKey(String key, Object obj) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException 
+		{
+    		if (methodMap.containsKey(key)) 
+	    	{
+	    		for(Method m: methodMap.get(key)) 
+	    		{
+	    			executeAsAccessible(m, obj);
+	    		}
+	    	}
+		}
+		
 	}
 	
 	public static void run(Class<?> testClass) {
@@ -79,42 +126,34 @@ final public class Runner {
     	String testInfo = "";
     	
     	try {
-	    	Object obj = null;
-	
-	    	Map<String, List<Method>> methodMap =  getMethodMap(testClass);
+	    	Object obj = null;    	
 	    	
-	    	if (methodMap.containsKey("AnnotationTest")) 
+	    	TestingContext context = new TestingContext(testClass);    	
+	    	Map<String, List<Method>> methodMap = context.getMethodMap();
+	    	
+//	    	Map<String, List<Method>> qwe = context.methodMap;
+//	    	context.clazz = testClass;
+	    	
+	    	if (methodMap.containsKey(TestingContext.Annotations.TEST.getName())) 
 	    	{
 	    		
-	    		testAll = methodMap.get("AnnotationTest").size();
+	    		testAll = methodMap.get(TestingContext.Annotations.TEST.getName()).size();
 	    		
 		    	try 
 		    	{		    		
-		    		if (methodMap.containsKey("AnnotationBeforeAll")) 
+		    		context.executeByKey(TestingContext.Annotations.BEFORE_ALL.getName(), null);
+		    		
+			    	for(Method t: methodMap.get(TestingContext.Annotations.TEST.getName())) 
 			    	{
-			    		for(Method m: methodMap.get("AnnotationBeforeAll")) 
-			    		{
-			    			start(m, null);
-			    		}
-			    	}
-			    	
-			    	for(Method t: methodMap.get("AnnotationTest")) 
-			    	{
-			    		obj = CreateObject(testClass.getDeclaredConstructor());
+			    		obj = context.сreateObject(testClass.getDeclaredConstructor());
 			    		
 			    		try 
 			    		{
-					    	if (methodMap.containsKey("AnnotationBeforeEach")) 
-					    	{
-					        	for(Method b: methodMap.get("AnnotationBeforeEach"))
-					        	{
-					        		start(b, obj);
-					        	}
-					    	}
-				        	
+			    			context.executeByKey(TestingContext.Annotations.BEFORE_EACH.getName(), obj);
+			    			
 					    	try
 					    	{
-					    		start(t, obj);
+					    		context.executeAsAccessible(t, obj);
 					    		testCompleted++;
 					    		testInfo += t.getName() + " completed" + System.lineSeparator();
 					    	}
@@ -131,13 +170,7 @@ final public class Runner {
 						}
 			    		finally 
 			    		{
-					    	if (methodMap.containsKey("AnnotationAfterEach")) 
-					    	{
-					        	for(Method a: methodMap.get("AnnotationAfterEach"))
-					        	{
-					        		start(a, obj);
-					        	}
-					    	}
+					    	context.executeByKey(TestingContext.Annotations.AFTER_EACH.getName(), obj);
 						}
 			    	}
 		    	}
@@ -147,13 +180,7 @@ final public class Runner {
 				}
 		    	finally 
 		    	{
-			    	if (methodMap.containsKey("AnnotationAfterAll")) 
-			    	{
-			    		for(Method m: methodMap.get("AnnotationAfterAll")) 
-			    		{
-			    			start(m, null);
-			    		}
-			    	}
+			    	context.executeByKey(TestingContext.Annotations.AFTER_ALL.getName(), null);
 				}
 	    	}
 	    	else 
