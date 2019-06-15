@@ -1,7 +1,7 @@
 package ru.otus;
 
-import ru.otus.atm.ATM;
-import ru.otus.moneyOperations.IBasicMoneyOperations;
+import ru.otus.classes.ATM;
+import ru.otus.interfaces.IBasicMoneyOperations;
 
 public class MainATM {
 
