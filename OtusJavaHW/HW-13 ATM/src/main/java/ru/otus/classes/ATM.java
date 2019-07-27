@@ -17,8 +17,7 @@ public class ATM implements IMoneyKeeper{
 	
 	public ATM() {
 		factory = new DefaultCellFactory();
-		cells = new TreeSet<ICell>();
-		cells = factory.createDefaultCellSet(); 
+		cells = factory.createCellSet(); 
 		
 		context = new ATMContext();
 		makeMoney = new ATMStrategyMakeMoney();
@@ -54,8 +53,8 @@ public class ATM implements IMoneyKeeper{
 			return money;
 		}
 		else {
-			restoreATMState();
 			System.out.println("Указанная сумма не может быть выдана");
+			restoreATMState();
 			return 0;
 		}	
 	}
@@ -71,11 +70,9 @@ public class ATM implements IMoneyKeeper{
 			System.out.println("Сумма в размере " + money + "р. принята.");
 		}
 		else {
-			restoreATMState();
 			System.out.println("Не удалось положить деньги на счет.");
+			restoreATMState();
 		}
-		//------->>
-		restoreATMState();
 		
 	}
 
@@ -87,7 +84,7 @@ public class ATM implements IMoneyKeeper{
 	
 	public void restoreATMState() {
 		ATMMemento memento = history.pop();
-		cells =new TreeSet<ICell>(memento.getCells());
+		cells = memento.getCells();
 	}
 	
 	private void saveATMState() {
@@ -98,21 +95,25 @@ public class ATM implements IMoneyKeeper{
 		private SortedSet<ICell> mementoCells;
 		
 		public ATMMemento () {
-			this.mementoCells = new TreeSet<ICell>(cells);
-			
-			for (ICell cell : mementoCells) {
+			System.out.println("------->>>>Create Memento ");
+			mementoCells = CopySet(cells);			
+		}
+		
+		public SortedSet<ICell> getCells(){	
+			System.out.println("------->>>>Get Memento ");	
+			return CopySet(mementoCells);
+		}
+		
+		private SortedSet<ICell>  CopySet(SortedSet<ICell> cells) {
+			factory = new EmptyCellFactory();
+			SortedSet<ICell> copy = factory.createCellSet();
+			for (ICell cell : cells) {
+				copy.add(cell.copy());
+				
 				System.out.println("------->>>>Balance " + cell.getFaceValues() + ": " +  cell.balance());
 			}
 			
-		}
-		
-		public SortedSet<ICell> getCells(){
-			
-			for (ICell cell : mementoCells) {
-				System.out.println("------->>>>---------Balance " + cell.getFaceValues() + ": " +  cell.balance());
-			}
-			
-			return mementoCells;
+			return copy;
 		}
 	}
 	

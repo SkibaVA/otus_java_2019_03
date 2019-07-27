@@ -45,4 +45,10 @@ public final class Cell implements ICell{
 		quantityBills += bills;
 	}
 
+	@Override
+	public ICell copy() {
+		ICell cell = new Cell(faceValue, quantityBills);
+		return cell;
+	}
+
 }
