@@ -1,7 +1,6 @@
 package ru.otus.interfaces;
 
-public interface IMoneyKeeper {
-	int balance();
+public interface IMoneyKeeper extends IBalance{
 
 	int giveMoney(int bills);
 

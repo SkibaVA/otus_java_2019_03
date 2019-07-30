@@ -1,12 +1,12 @@
 package ru.otus.classes;
 
 import java.util.SortedSet;
-import java.util.TreeSet;
 
+import ru.otus.interfaces.IATMDepartment;
 import ru.otus.interfaces.ICell;
 import ru.otus.interfaces.IMoneyKeeper;
 
-public class ATM implements IMoneyKeeper{
+public class ATM implements IMoneyKeeper, IATMDepartment{
 
 	private SortedSet<ICell> cells;
 	private CellFactory factory;  
@@ -15,7 +15,7 @@ public class ATM implements IMoneyKeeper{
 	private ATMStrategyMakeMoney makeMoney;
 	private ATMStrategyGiveMoney giveMoney;
 	
-	public ATM() {
+	public ATM() {		
 		factory = new DefaultCellFactory();
 		cells = factory.createCellSet(); 
 		
@@ -26,12 +26,12 @@ public class ATM implements IMoneyKeeper{
 		history = new ATMHistory();
 	}
 	
+	
 	@Override
 	public int balance() {
 		int balance = 0;
 		for (ICell cell : cells) {
 			balance += cell.balance();
-			System.out.println("Balance " + cell.getFaceValues() + ": " +  cell.balance());
 		}
 		return balance;
 	}
@@ -95,12 +95,10 @@ public class ATM implements IMoneyKeeper{
 		private SortedSet<ICell> mementoCells;
 		
 		public ATMMemento () {
-			System.out.println("------->>>>Create Memento ");
 			mementoCells = CopySet(cells);			
 		}
 		
 		public SortedSet<ICell> getCells(){	
-			System.out.println("------->>>>Get Memento ");	
 			return CopySet(mementoCells);
 		}
 		
@@ -109,8 +107,6 @@ public class ATM implements IMoneyKeeper{
 			SortedSet<ICell> copy = factory.createCellSet();
 			for (ICell cell : cells) {
 				copy.add(cell.copy());
-				
-				System.out.println("------->>>>Balance " + cell.getFaceValues() + ": " +  cell.balance());
 			}
 			
 			return copy;

@@ -2,13 +2,13 @@ package ru.otus.classes;
 
 import java.util.SortedSet;
 
-import ru.otus.interfaces.ATMStrategy;
+import ru.otus.interfaces.IATMStrategy;
 import ru.otus.interfaces.ICell;
 
 public class ATMContext {
-	private ATMStrategy strategy;
+	private IATMStrategy strategy;
 	
-    public void setStrategy(ATMStrategy strategy) {
+    public void setStrategy(IATMStrategy strategy) {
     	this.strategy = strategy;
     }
 

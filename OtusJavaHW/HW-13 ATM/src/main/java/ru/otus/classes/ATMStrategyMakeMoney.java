@@ -2,10 +2,10 @@ package ru.otus.classes;
 
 import java.util.SortedSet;
 
-import ru.otus.interfaces.ATMStrategy;
+import ru.otus.interfaces.IATMStrategy;
 import ru.otus.interfaces.ICell;
 
-public class ATMStrategyMakeMoney implements ATMStrategy{
+public class ATMStrategyMakeMoney implements IATMStrategy{
 
 	@Override
 	public boolean execute(int money, SortedSet<ICell> cells) {
@@ -21,7 +21,6 @@ public class ATMStrategyMakeMoney implements ATMStrategy{
 			}
 		}
 		catch(Throwable ex) {
-			//throw new Error(ex.getMessage());
 			return false;
 		}
 		
